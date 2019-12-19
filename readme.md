@@ -1,6 +1,3 @@
-**About the application**
-* This application specifically developed for Carleton University - COMP2406 students with love between September 2018 ant March 2019.
-
 **How to run**
 To run this app you need a personal Paypal Account
 You can create on at paypal.com
