@@ -89,6 +89,7 @@ router.post('/apply-discount', ensureAuthenticated, function(req, res, next){
 //
 /////////////////////////////////////////////////////////////////////
 router.post('/checkout-process', function(req, res){
+    const url = `${req.protocol}://${req.headers.host}`;
     let cart = new Cart(req.session.cart);
     let totalPrice = (req.session.cart.discountPrice > 0) ? req.session.cart.discountPrice : cart.totalPrice;
     // Create payment json starts
@@ -98,8 +99,8 @@ router.post('/checkout-process', function(req, res){
             "payment_method": "paypal"
         },
         "redirect_urls": {
-            "return_url": "http://localhost:3000/checkout/checkout-success",
-            "cancel_url": "http://localhost:3000/checkout/checkout-cancel"
+            "return_url": `${url}/checkout/checkout-success`,
+            "cancel_url": `${url}//checkout/checkout-cancel`
         },
         "transactions": [{
             "item_list": {
