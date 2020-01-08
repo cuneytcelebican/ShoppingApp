@@ -15,7 +15,7 @@ var passport          = require('passport');
 var MongoStore        = require('connect-mongo')(session);
 var mongoose          = require('mongoose');
 
-mongoose.connect('mongodb://localhost/yardAndGarage', { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+mongoose.connect('mongodb+srv://yardandgarage:7BwRhCgOyLw2C60M@cluster0-iabt2.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
 
 var index = require('./routes/index');
 var users = require('./routes/users');

@@ -6,7 +6,7 @@ var Variant     = require('../models/variant');
 var mongoose    = require('mongoose');
 var colour      = require('colour');
 //mongoose.connect('mongodb://localhost/shoppingApp');
-mongoose.connect('mongodb://localhost/yardAndGarage', { useNewUrlParser: true, useCreateIndex: true, });
+mongoose.connect('mongodb+srv://yardandgarage:7BwRhCgOyLw2C60M@cluster0-iabt2.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
 
 function deleteVariants(callback)
 {
