@@ -15,7 +15,7 @@ var passport          = require('passport');
 var MongoStore        = require('connect-mongo')(session);
 var mongoose          = require('mongoose');
 
-mongoose.connect('mongodb://localhost/yardAndGarage', { useNewUrlParser: true, useCreateIndex: true, });
+mongoose.connect('mongodb://localhost/yardAndGarage', { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -27,8 +27,8 @@ var dashboard = require('./routes/dashboard');
 // https://developer.paypal.com/docs/archive/checkout/how-to/server-integration/#2-set-up-your-server-to-call-the-paypal-api
 paypal.configure({
   'mode': 'sandbox', //sandbox or live
-  'client_id': 'YOUR_CLIENT_ID',
-  'client_secret': 'YOUR_SECRET_CODE'
+  'client_id': 'AdTSWcvo3q9Z2Dc6O3JQPFv3g5ApbIZjHv_ZKby8hHVexN1vy89XjvuQQcQBUa71OoJul6m9TV5X55l_',
+  'client_secret': 'EFnhOQ1uXft_8vT9WWPnofBWPfyjkecz5rFN6D-a4nozF3ihBctN3lrrnrH-0B5ZbBZt94pHHBkOync5'
 });
 
 // Moment Configuration -- For dates
