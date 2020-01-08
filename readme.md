@@ -1,6 +1,10 @@
 **Demo**
 http://yardandgarage.herokuapp.com/
 
+**Login information**
+username : `admin@admin.com`
+password : `admin`
+
 **How to run**
 To run this app you need a personal Paypal Account
 You can create on at paypal.com
