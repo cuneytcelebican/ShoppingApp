@@ -17,7 +17,13 @@ var Discount                = require('../models/discount');
 // to 0 always.
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/', ensureAuthenticated, function(req, res, next){
+router.get('/', ensureAuthenticatedInCheckout, function(req, res, next){
+    let cart = new Cart(req.session.cart);
+    req.session.cart.discountPrice = 0;
+    res.render('checkout', {title: 'Checkout Page', items: cart.generateArray(), totalPrice: cart.totalPrice, bodyClass: 'registration', containerWrapper: 'container'});
+})
+
+router.get('/pay', ensureAuthenticated, function(req, res, next){
     let cart = new Cart(req.session.cart);
     req.session.cart.discountPrice = 0;
     res.render('checkout', {title: 'Checkout Page', items: cart.generateArray(), totalPrice: cart.totalPrice, bodyClass: 'registration', containerWrapper: 'container'});
@@ -170,8 +176,6 @@ router.get('/checkout-success', ensureAuthenticated, function(req, res){
                 total               : payment.transactions[0].amount.total
               });
             newOrder.save();
-            console.log("cart: ", req.session.cart);
-            console.log("cart2: ", cart);
             let cartItems = cart.items
 
             decreaseInventory(cartItems, function(c)
@@ -262,7 +266,6 @@ function decreaseInventory(cartItems, callback)
     for (let item in cartItems)
     {
         let qty = cartItems[item].qty;
-        console.log("QTY IS: ", qty)
         Product.getProductByID(item, function(e, p)
         {
             if (p)
@@ -304,6 +307,7 @@ function decreaseInventory(cartItems, callback)
 //
 /////////////////////////////////////////////////////////////////////
 function ensureAuthenticated(req, res, next){
+    req.session.redirectToCheckout = false;
     if (req.isAuthenticated())
     {
       Department.getAllDepartments(function(e, departments)
@@ -314,8 +318,25 @@ function ensureAuthenticated(req, res, next){
     }
     else{
       req.flash('error_msg', 'You are not logged in');
-      res.redirect('/');
+      res.redirect('/users/login');
     }
 };
 
+
+function ensureAuthenticatedInCheckout(req, res, next){
+    req.session.redirectToCheckout = true;
+    
+    if (req.isAuthenticated())
+    {
+      Department.getAllDepartments(function(e, departments)
+      {
+        req.session.department = JSON.stringify(departments)
+        return next();
+      })
+    }
+    else{
+      req.flash('error_msg', 'You are not logged in');
+      res.redirect('/users/login');
+    }
+};
 module.exports = router;

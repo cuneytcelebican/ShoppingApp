@@ -62,7 +62,9 @@
                 {{#if qty}}
                     <div id="inventory-buy" class="inventory-buy" style="display:block">
                         <a href="/add-to-bag/{{product._id}}" id="add-to-bag-link" class="btn btn-primary pad10"><i class="fa fa-shopping-basket" aria-hidden="true"></i> Add to bag</a>
+                        {{#if user}}
                         <a href="/checkout/buy-now/{{product._id}}" id="buy-now-link" class="btn btn-danger pad10"><i class="fa fa-bolt" aria-hidden="true"></i> Buy now</a>
+                        {{/if}}
                     </div>
                     <div id="soldout" class="soldout" style="display:none">
                         sold out

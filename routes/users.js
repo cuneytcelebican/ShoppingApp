@@ -141,8 +141,41 @@ passport.deserializeUser(function(id, done) {
 // again. I also inject the user's bag to session here.
 //
 /////////////////////////////////////////////////////////////////////
-router.post('/login', passport.authenticate('local',{failureRedirect: '/users/login', failureFlash: true}), function(req, res, next) {
-        let uid = req.session.passport.user;
+router.post('/login', passport.authenticate('local',{failureRedirect: '/users/login', failureFlash: true}), function(req, res, next) 
+{
+    const uid = req.session.passport.user;
+    if (req.session.cart && req.session.cart.totalQty && req.session.cart.totalQty > 0)
+    {
+        let cart = new Cart(req.session.cart ? req.session.cart : {});
+        req.session.cart = cart;
+        
+        User.findOneAndUpdate({"_id": uid}, 
+        { $set: {
+            "cart": cart
+            }
+        },
+        { new: true }, function(e, result){
+            if (e)
+            {
+                console.log("Failed on router.post('/login')\nError:".error, e.message.error + "\n")
+                e.status = 406; next(e);
+            }
+            else {
+                req.session.user = {};
+                let redirectLink = "/";
+
+                if(req.session.redirectToCheckout === true)
+                {
+                    req.session.redirectToCheckout = false;
+                    redirectLink = "/checkout/pay";
+                }
+                
+                res.redirect(redirectLink);
+            }
+        });
+    }
+    else
+    {
         User.findOne({ "_id": uid }, function(e, user){
             if (e)
             {
@@ -156,9 +189,10 @@ router.post('/login', passport.authenticate('local',{failureRedirect: '/users/lo
                 req.session.user = {}
                 res.redirect('/');
             }
-        })
+        });
     }
-);
+    
+});
 
 /////////////////////////////////////////////////////////////////////
 //

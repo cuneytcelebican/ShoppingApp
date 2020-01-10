@@ -16,8 +16,13 @@ function changeVariant(imagePath, color, size, id, qty)
         document.getElementById("inventory-buy").style.display = "block";
         document.getElementById("soldout").style.display = "none";
     }
+
+    if (document.getElementById("buy-now-link"))
+    {
+        document.getElementById("buy-now-link").href = "/checkout/buy-now/" + id;
+    }
+
     document.getElementById("add-to-bag-link").href = "/add-to-bag/" + id;
-    document.getElementById("buy-now-link").href = "/checkout/buy-now/" + id;
     document.getElementById("product-color").innerHTML = (color) ? color : "Default"
     document.getElementById("p-img").src = imagePath
     if(size == "")
@@ -83,9 +88,10 @@ function remove(ev) {
 }
 function dropDepartment(ev) {
     var data = ev.dataTransfer.getData("Text");
-    if (ev.target.getElementsByTagName("*").length == 0)
+    var navListItems = document.getElementById("navbar-list-items");
+    if (ev.target.getElementsByTagName("*").length == 0 && navListItems && navListItems.value)
     {
-        var departments = JSON.parse(document.getElementById("navbar-list-items").value)
+        var departments = JSON.parse(navListItems.value);
         for (let i = 0; i < departments.length; i++)
         {
             if (departments[i].departmentName == data)

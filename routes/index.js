@@ -15,8 +15,9 @@ var Department    = require('../models/department');
 // else redirect to login page
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/', ensureAuthenticated, function(req, res, next)
+router.get('/', function(req, res, next)
 {
+  console.log("session", req.session)
   Product.getAllProducts(function(e, products)
   {
     if (e)
@@ -39,7 +40,7 @@ router.get('/', ensureAuthenticated, function(req, res, next)
 // Renders productOverview.hbs with available data from database 
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/product-overview/:id', ensureAuthenticated, function(req, res, next)
+router.get('/product-overview/:id', function(req, res, next)
 {
   let productId = req.params.id;
   Product.getProductByID(productId, function(e, item)
@@ -56,7 +57,7 @@ router.get('/product-overview/:id', ensureAuthenticated, function(req, res, next
         let qty;
         if (item.quantity < 1) { qty = false} else{qty = true}
         
-        res.render('productOverview', { title: 'Express', product: item, variants: variants, qty: qty});
+        res.render('productOverview', { title: item.title, product: item, variants: variants, qty: qty});
       })
     }
   });
@@ -70,7 +71,7 @@ router.get('/product-overview/:id', ensureAuthenticated, function(req, res, next
 // Renders index.hbs with available data from database 
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/product-list/:department/:category', ensureAuthenticated, function(req, res, next)
+router.get('/product-list/:department/:category', function(req, res, next)
 {
   let aDepartment = req.params.department;
   let aCategory = req.params.category;
@@ -96,7 +97,7 @@ router.get('/product-list/:department/:category', ensureAuthenticated, function(
 // Renders index.hbs with available data from database 
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/product-list/:department', ensureAuthenticated, function(req, res, next)
+router.get('/product-list/:department', function(req, res, next)
 {
   let aDepartment = req.params.department;
   Product.getProductByDepartment(aDepartment, function(e, products)
@@ -119,7 +120,7 @@ router.get('/product-list/:department', ensureAuthenticated, function(req, res, 
 // adds selected item to the bag
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/add-to-bag/:id', ensureAuthenticated, function(req, res, next){
+router.get('/add-to-bag/:id', function(req, res, next){
     let productId = req.params.id;
     let cart = new Cart(req.session.cart ? req.session.cart : {});
 
@@ -134,8 +135,13 @@ router.get('/add-to-bag/:id', ensureAuthenticated, function(req, res, next){
         if (product)
         {
           cart.add(product, product.id);
-          cart.userId = req.user._id;
+
+          if (req.user)
+          {
+            cart.userId = req.user._id;
+          }
           req.session.cart = cart;
+
           res.redirect('/');
         }
         else
@@ -168,7 +174,7 @@ router.get('/add-to-bag/:id', ensureAuthenticated, function(req, res, next){
 // Decreases the number of selected item in the shopping bag
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/decrease/:id', ensureAuthenticated, function(req,res, next){
+router.get('/decrease/:id', function(req,res, next){
   let productId = req.params.id;
   let cart = new Cart(req.session.cart);
 
@@ -183,7 +189,7 @@ router.get('/decrease/:id', ensureAuthenticated, function(req,res, next){
 // Increases the number of selected item in the shopping bag
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/increase/:id', ensureAuthenticated, function(req,res, next){
+router.get('/increase/:id', function(req,res, next){
   let productId = req.params.id;
   let cart = new Cart(req.session.cart);
 
@@ -228,7 +234,7 @@ router.get('/increase/:id', ensureAuthenticated, function(req,res, next){
 // Renders shoppingBag.hbs with available data from database 
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/shopping-bag', ensureAuthenticated, function(req, res, next){
+router.get('/shopping-bag', function(req, res, next){
   if (!req.session.cart)
   {
     res.render('shoppingBag', {items: null, containerWrapper: 'container'});
@@ -268,7 +274,7 @@ router.get('/order-history', ensureAuthenticated, function(req, res, next){
 // MIDDLEWARE - Handles POST/GET requests to the search
 //
 /////////////////////////////////////////////////////////////////////
-router.post('/search', ensureAuthenticated, function(req, res, next){
+router.post('/search', function(req, res, next){
   let query = toTitleCase(req.body.query)
   if (query.includes(","))
   {
@@ -330,7 +336,7 @@ router.post('/search', ensureAuthenticated, function(req, res, next){
   }
 });
 
-router.get('/search', ensureAuthenticated, function(req, res, next){
+router.get('/search', function(req, res, next){
   if (req.query.query == undefined)
   {
     res.redirect('/')
@@ -399,7 +405,7 @@ router.get('/search', ensureAuthenticated, function(req, res, next){
 });
 
 // Auto-show search
-router.get('/presearch', ensureAuthenticated, function(req,res,next){  
+router.get('/presearch', function(req,res,next){  
   let query = toTitleCase(req.query.q)
   
   if (query.includes(","))
@@ -451,7 +457,7 @@ router.get('/presearch', ensureAuthenticated, function(req,res,next){
 // Renders index.hbs with filtered data from database
 //
 /////////////////////////////////////////////////////////////////////
-router.post('/filters', ensureAuthenticated, function(req, res, next){
+router.post('/filters', function(req, res, next){
   let low   = req.body.lowPrice;
   let high  = req.body.highPrice
   if (low === "on" && high == undefined)

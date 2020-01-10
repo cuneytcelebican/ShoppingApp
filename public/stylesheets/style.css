@@ -126,6 +126,11 @@ label {
 .copyright {
   margin-bottom: 20px;
 }
+
+.copyright>small {
+  display: block;
+  margin-bottom: 15px;
+}
 /*--------------------------------------------------------------
 Checkboxes, radio buttons
 --------------------------------------------------------------*/
@@ -531,10 +536,10 @@ Product page
 }
 .product-action-buttons > .inventory-buy > a {
   float: left;
-  width: 48%;
+  width: 46%;
 }
-.product-action-buttons > .inventory-buy > a:last-child {
-  float: right;
+.product-action-buttons > .inventory-buy > a:first-child {
+  margin-right: 10px;
 }
 
 .product-action-buttons > .inventory-buy > button {

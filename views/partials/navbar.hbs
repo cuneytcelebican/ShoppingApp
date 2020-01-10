@@ -57,6 +57,7 @@
           <ul class="nav navbar-nav navbar-right" id="main-navbar">
             <li><a href="/">All Products</a></li>
             <li><a href="/shopping-bag"><i class="fa fa-shopping-basket" aria-hidden="true"></i> Shopping Bag <span class="badge">{{session.cart.totalQty}}</span></a></li>
+            {{#if user}}
             <li class="dropdown user-info">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Hello, {{user.fullname}}<span class="caret"></span></a>
               <ul class="dropdown-menu custom-navbar-dropdown">
@@ -65,6 +66,9 @@
                 <li><a href="/users/logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
               </ul>
             </li>
+            {{else}}
+            <li><a href="/users/login">Login</a></li>
+            {{/if}}
           </ul>
 
         </div><!-- /.navbar-collapse -->
@@ -74,7 +78,9 @@
 <!-- Header ends -->
 
 <script>
-  var data = JSON.parse(document.getElementById("navbar-list-items").value)
+  var navItemList = document.getElementById("navbar-list-items");
+  var data = (navItemList && navItemList.value) ? JSON.parse(navItemList.value) : "";
+
   for (let i = 0; i < data.length; i++)
   {
     if (data[i].categories)
