@@ -17,7 +17,6 @@ var Department    = require('../models/department');
 /////////////////////////////////////////////////////////////////////
 router.get('/', init, function(req, res, next)
 {
-  console.log("session", req.session)
   Product.getAllProducts(function(e, products)
   {
     if (e)
