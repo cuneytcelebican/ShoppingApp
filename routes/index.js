@@ -15,7 +15,7 @@ var Department    = require('../models/department');
 // else redirect to login page
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/', function(req, res, next)
+router.get('/', init, function(req, res, next)
 {
   console.log("session", req.session)
   Product.getAllProducts(function(e, products)
@@ -40,7 +40,7 @@ router.get('/', function(req, res, next)
 // Renders productOverview.hbs with available data from database 
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/product-overview/:id', function(req, res, next)
+router.get('/product-overview/:id', init, function(req, res, next)
 {
   let productId = req.params.id;
   Product.getProductByID(productId, function(e, item)
@@ -71,7 +71,7 @@ router.get('/product-overview/:id', function(req, res, next)
 // Renders index.hbs with available data from database 
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/product-list/:department/:category', function(req, res, next)
+router.get('/product-list/:department/:category', init, function(req, res, next)
 {
   let aDepartment = req.params.department;
   let aCategory = req.params.category;
@@ -97,7 +97,7 @@ router.get('/product-list/:department/:category', function(req, res, next)
 // Renders index.hbs with available data from database 
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/product-list/:department', function(req, res, next)
+router.get('/product-list/:department', init, function(req, res, next)
 {
   let aDepartment = req.params.department;
   Product.getProductByDepartment(aDepartment, function(e, products)
@@ -120,7 +120,7 @@ router.get('/product-list/:department', function(req, res, next)
 // adds selected item to the bag
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/add-to-bag/:id', function(req, res, next){
+router.get('/add-to-bag/:id', init, function(req, res, next){
     let productId = req.params.id;
     let cart = new Cart(req.session.cart ? req.session.cart : {});
 
@@ -174,7 +174,7 @@ router.get('/add-to-bag/:id', function(req, res, next){
 // Decreases the number of selected item in the shopping bag
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/decrease/:id', function(req,res, next){
+router.get('/decrease/:id', init, function(req,res, next){
   let productId = req.params.id;
   let cart = new Cart(req.session.cart);
 
@@ -189,7 +189,7 @@ router.get('/decrease/:id', function(req,res, next){
 // Increases the number of selected item in the shopping bag
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/increase/:id', function(req,res, next){
+router.get('/increase/:id', init, function(req,res, next){
   let productId = req.params.id;
   let cart = new Cart(req.session.cart);
 
@@ -234,7 +234,7 @@ router.get('/increase/:id', function(req,res, next){
 // Renders shoppingBag.hbs with available data from database 
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/shopping-bag', function(req, res, next){
+router.get('/shopping-bag', init, function(req, res, next){
   if (!req.session.cart)
   {
     res.render('shoppingBag', {items: null, containerWrapper: 'container'});
@@ -253,7 +253,7 @@ router.get('/shopping-bag', function(req, res, next){
 // Renders orderHistory.hbs with available data from database 
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/order-history', ensureAuthenticated, function(req, res, next){
+router.get('/order-history', init, ensureAuthenticated, function(req, res, next){
   Order.find({"username": req.user.username }, function(e, order)
   {
     if (e)
@@ -336,7 +336,7 @@ router.post('/search', function(req, res, next){
   }
 });
 
-router.get('/search', function(req, res, next){
+router.get('/search', init, function(req, res, next){
   if (req.query.query == undefined)
   {
     res.redirect('/')
@@ -405,7 +405,7 @@ router.get('/search', function(req, res, next){
 });
 
 // Auto-show search
-router.get('/presearch', function(req,res,next){  
+router.get('/presearch', init, function(req,res,next){  
   let query = toTitleCase(req.query.q)
   
   if (query.includes(","))
@@ -457,7 +457,7 @@ router.get('/presearch', function(req,res,next){
 // Renders index.hbs with filtered data from database
 //
 /////////////////////////////////////////////////////////////////////
-router.post('/filters', function(req, res, next){
+router.post('/filters', init, function(req, res, next){
   let low   = req.body.lowPrice;
   let high  = req.body.highPrice
   if (low === "on" && high == undefined)
@@ -547,6 +547,15 @@ function cleanQuery(array) {
 function toTitleCase(arg)
 {
     return arg.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
+function init(req, res, next)
+{
+    Department.getAllDepartments(function(e, departments)
+    {
+        req.session.department = JSON.stringify(departments)
+        return next();
+    })
 }
 
 module.exports = router;

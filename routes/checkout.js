@@ -17,7 +17,7 @@ var Discount                = require('../models/discount');
 // to 0 always.
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/', ensureAuthenticatedInCheckout, function(req, res, next){
+router.get('/', init, ensureAuthenticatedInCheckout, function(req, res, next){
     let cart = new Cart(req.session.cart);
     req.session.cart.discountPrice = 0;
     res.render('checkout', {title: 'Checkout Page', items: cart.generateArray(), totalPrice: cart.totalPrice, bodyClass: 'registration', containerWrapper: 'container'});
@@ -39,7 +39,7 @@ router.get('/pay', ensureAuthenticated, function(req, res, next){
 // created redirect middleware for that reason.
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/apply-discount', ensureAuthenticated, function(req, res, next){
+router.get('/apply-discount', init, ensureAuthenticated, function(req, res, next){
     res.redirect('/checkout')
 })
 
@@ -51,7 +51,7 @@ router.get('/apply-discount', ensureAuthenticated, function(req, res, next){
 // discounted price.
 //
 /////////////////////////////////////////////////////////////////////
-router.post('/apply-discount', ensureAuthenticated, function(req, res, next){
+router.post('/apply-discount', init, ensureAuthenticated, function(req, res, next){
     let discountCode = req.body.discountCode; 
     Discount.getDiscountByCode(discountCode, function(e, discount)
     {
@@ -94,7 +94,7 @@ router.post('/apply-discount', ensureAuthenticated, function(req, res, next){
 // Derived from https://github.com/paypal/PayPal-node-SDK
 //
 /////////////////////////////////////////////////////////////////////
-router.post('/checkout-process', function(req, res){
+router.post('/checkout-process', init, function(req, res){
     const url = `${req.protocol}://${req.headers.host}`;
     let cart = new Cart(req.session.cart);
     let totalPrice = (req.session.cart.discountPrice > 0) ? req.session.cart.discountPrice : cart.totalPrice;
@@ -140,7 +140,7 @@ router.post('/checkout-process', function(req, res){
     });
 });
 
-router.get('/checkout-success', ensureAuthenticated, function(req, res){
+router.get('/checkout-success', init, ensureAuthenticated, function(req, res){
     let cart = new Cart(req.session.cart);
     let totalPrice = (req.session.cart.discountPrice > 0) ? req.session.cart.discountPrice : cart.totalPrice;
     const payerID = req.query.PayerID;
@@ -194,7 +194,7 @@ router.get('/checkout-success', ensureAuthenticated, function(req, res){
     });
 });
 
-router.get('/checkout-cancel', ensureAuthenticated, function(req, res){
+router.get('/checkout-cancel', init, ensureAuthenticated, function(req, res){
     res.render('checkoutCancel', {title: 'Successful', containerWrapper: 'container'});
 });
 
@@ -210,7 +210,7 @@ router.get('/checkout-cancel', ensureAuthenticated, function(req, res){
 //      item in the bag then go to checkout page.
 //
 /////////////////////////////////////////////////////////////////////
-router.get('/buy-now/:id', ensureAuthenticated, function(req, res, next){
+router.get('/buy-now/:id', init, ensureAuthenticated, function(req, res, next){
     let productId = req.params.id;
     let cart = new Cart(req.session.cart ? req.session.cart : {});
     Product.findById(productId, function(e, product){
@@ -308,17 +308,10 @@ function decreaseInventory(cartItems, callback)
 /////////////////////////////////////////////////////////////////////
 function ensureAuthenticated(req, res, next){
     req.session.redirectToCheckout = false;
-    if (req.isAuthenticated())
+    if (!req.isAuthenticated())
     {
-      Department.getAllDepartments(function(e, departments)
-      {
-        req.session.department = JSON.stringify(departments)
-        return next();
-      })
-    }
-    else{
-      req.flash('error_msg', 'You are not logged in');
-      res.redirect('/users/login');
+        req.flash('error_msg', 'You are not logged in');
+        res.redirect('/users/login');
     }
 };
 
@@ -326,17 +319,19 @@ function ensureAuthenticated(req, res, next){
 function ensureAuthenticatedInCheckout(req, res, next){
     req.session.redirectToCheckout = true;
     
-    if (req.isAuthenticated())
+    if (!req.isAuthenticated())
     {
-      Department.getAllDepartments(function(e, departments)
-      {
-        req.session.department = JSON.stringify(departments)
-        return next();
-      })
-    }
-    else{
-      req.flash('error_msg', 'You are not logged in');
-      res.redirect('/users/login');
+        req.flash('error_msg', 'You are not logged in');
+        res.redirect('/users/login');
     }
 };
+
+function init(req, res, next)
+{
+    Department.getAllDepartments(function(e, departments)
+    {
+        req.session.department = JSON.stringify(departments)
+        return next();
+    })
+}
 module.exports = router;
